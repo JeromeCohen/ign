@@ -34,7 +34,7 @@ $(function (){
   $("#articles").click(function(event){
     const feed = $('#feed');
     feed.empty();
-    feed.append(articles); 
+    feed.append(articles);
   });
 
 });
