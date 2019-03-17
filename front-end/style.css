@@ -1,6 +1,54 @@
+h1 {
+  border-bottom: 0px solid grey;
+  border-width: thin;
+  margin-top: 0.5em;
+}
+
+a {
+  font-size: 1rem;
+  color: black;
+}
+
+
 body {
   overflow-x: hidden;
+  background-color: #fefcfe
 }
+.sidebar {
+  margin-bottom: 1em;
+}
+
+.col-centered{
+    float: none;
+    margin: 0 auto;
+}
+
+.list-group-item.active {
+  background-color: #b51112;
+  border-color: #b51112;
+}
+
+.thumbnail {
+  border-radius: 10px;
+  margin-left: -15px;
+}
+
+img:hover {
+  webkit-filter: opacity(50%);
+  filter: opacity(50%);
+}
+
+.container {
+  border-bottom: 0px solid grey;
+  border-width: thin;
+  padding-bottom: 1em;
+  margin-bottom: 1em;
+}
+
+#feed {
+  padding: 0em;
+}
+
 
 @media (min-width: 768px) {
 
