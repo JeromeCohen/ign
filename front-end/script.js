@@ -1,103 +1,159 @@
-var articles = '';
-var videos = '';
-var latest = '';
+var content;
 
 $(function (){
+  //pull content for IGN api
   $.ajax({
-  url: 'https://ign-apis.herokuapp.com/content',
-  type: 'GET',
-  dataType: 'jsonp',
-  crossdomain: true,
-  success: data => {
-    console.log(data)
-    const feed = $('#feed')
-    const imgurl = data.data[1].thumbnails[2].url;
+    url: 'https://ign-apis.herokuapp.com/content',
+    type: 'GET',
+    dataType: 'jsonp',
+    crossdomain: true,
+    success: data => {
+      console.log(data)
+      content = data.data;
+      var contentIds = '';
+      data.data.forEach((item) => {
+        contentIds = contentIds + "," + item.contentId;
+      });
+      contentIds = contentIds.substring(1);
 
-    data.data.forEach(function(item) {
-      createHTML(item)
-    });
-
-    feed.append(articles);
+      //getComments also loadsFeed
+      getComments(contentIds, loadFeed);
   },
   error: function(request, error) {
     console.log(error);
   }
-  });
-
-  $("#videos").click(function(event){
-    //populate feed with videos
-    const feed = $('#feed');
-    feed.fadeOut("slow", function() {
-      feed.empty();
-      feed.append(videos);
-    });
-    feed.fadeIn("slow", function() {
-      console.log('animation complete');
-    });
-
-
-    //add active styling to video link
-    var current = document.getElementsByClassName("active");
-    current[0].className = current[0].className.replace(" active", "")
-    this.className += " active"
-  });
-
-  $("#articles").click(function(event){
-    //populate feed with articles
-    const feed = $('#feed');
-    feed.fadeOut("slow", function() {
-      feed.empty();
-      feed.append(articles);
-    });
-    feed.fadeIn("slow", function() {
-      console.log('animation complete');
-    });
-
-    //add active styling to articles link
-    var current = document.getElementsByClassName("active");
-    current[0].className = current[0].className.replace(" active", "")
-    this.className += " active"
-  });
-
 });
 
-function createHTML(data) {
-  const time = postedAgo(data.metadata.publishDate) + "hr";
-  const imgurl = data.thumbnails[2].url;
-  const title = data.metadata.headline;
-  if (data.contentType == 'article') {
-    articles +=
-    `<div class="container">
-     <div class="row align-items-center">
-       <div class="col-12 col-md-6"><img class="thumbnail" width="100%" src="${imgurl}" sizes="(max-width: 660px) 100vw, 660px"></div>
-        <div class="col-12 col-md-6">
-          <p>${time}</p>
-          <a href="#">${title}</a>
+  //Add sidebar functionality
+  $(".list-group-item").each(function( index ) {
+    $(this).click((event) => {
+      //decide content type - latest is handled as a type so that re-ordering
+      //can take place in helper function
+      var type = '';
+      switch (event.target.id) {
+        case "articles":
+          type = "article";
+          break;
+        case "videos":
+          type = "video";
+          break;
+        case "latest":
+          type = "article";
+          break;
+      }
+      //populate feed with articles
+      const feed = $('#feed');
+      feed.fadeOut("slow", function() {
+        feed.empty();
+        loadFeed(content, type);
+      });
+      feed.fadeIn("slow", function() {
+        console.log('animation complete');
+      });
+
+      //add active styling to sidebar link
+      var current = document.getElementsByClassName("active");
+      current[0].className = current[0].className.replace(" active", "")
+      this.className += " active"
+    });
+  });
+});
+
+const loadFeed = (data, type) => {
+  data.forEach((item) => {
+    createHTMlHelper(item, type);
+  });
+}
+
+//pulls appropriate data from JSON and creates container
+const createHTMlHelper = (item, type) => {
+  if (item.contentType == type) {
+    const feed = $('#feed');
+    const ago = postedAgo(item.metadata.publishDate);
+    const time = `${ago.day} days, ${ago.hour} hours, ${ago.minute} minutes`
+    const imgurl = item.thumbnails[2].url;
+    const title = (type === 'video') ? item.metadata.title : item.metadata.headline;
+    const duration = (type === 'video') ? secondsToMinutes(item.metadata.duration) : '';
+
+    const count = item.metadata.comments;
+    var comments = count;
+    if (count === 0) {
+      comments = "";
+    }
+
+    html = $(`<div class="container">
+       <div class="row">
+         <div class="col-md-6">
+          <div class="thumb-img">
+            <img class="thumbnail" width="100%" src="${imgurl}" sizes="(max-width: 660px) 100vw, 660px">
+            <div class='duration'><i class="fas fa-play-circle fa-lg"></i> ${duration}</div>
+          </div>
         </div>
-      </div>
-    </div>`
-  } else {
-    const title = data.metadata.title;
-    videos +=
-    `<div class="container">
-     <div class="row align-items-center">
-       <div class="col-12 col-md-6"><img class="thumbnail" width="100%" src="${imgurl}" sizes="(max-width: 660px) 100vw, 660px"></div>
-        <div class="col-12 col-md-6">
-          <p>${time}</p>
-          <a href="#">${title}</a>
+        <div class="col-md-6 caption">
+          <p class='metadata'><span>${time} • <i class="far fa-comment fa-sm"></i> ${comments}</span></p>
+          <a class="title" href="#">${title}</a>
         </div>
-      </div>
-    </div>`
+      </div>`);
+
+    feed.append(html);
+
+    if (type === 'video') {
+      $('.duration').css('display', 'block');
+    }
+
   }
+}
 
-  return articles
-
+ //helper function to handle timestamps on posts
  function postedAgo(date) {
-   console.log(date);
    date = new Date(date);
    var today = new Date();
    var difference = Math.abs(today - date);
-   var totalHours = Math.ceil((difference / (1000 * 3600)));
-   return totalHours
+   var ago = convertMS(difference);
+   return ago
  }
-}
+
+ function secondsToMinutes(duration) {
+   return Math.floor(duration / 60) + ":" + (duration % 60);
+ }
+
+ function convertMS( milliseconds ) {
+    var day, hour, minute, seconds;
+    seconds = Math.floor(milliseconds / 1000);
+    minute = Math.floor(seconds / 60);
+    seconds = seconds % 60;
+    hour = Math.floor(minute / 60);
+    minute = minute % 60;
+    day = Math.floor(hour / 24);
+    hour = hour % 24;
+    return {
+        day: day,
+        hour: hour,
+        minute: minute,
+        seconds: seconds
+    };
+  }
+
+ const getComments = (contentIds, callback) => {
+   $.ajax({
+     url: 'https://ign-apis.herokuapp.com/comments',
+     type: 'GET',
+     data: "ids=" + contentIds,
+     dataType: 'jsonp',
+     crossdomain: true,
+     success: data => {
+       console.log(data)
+       count = 0;
+       data.content.forEach((item) => {
+         content[count].metadata.comments = item.count;
+         count++;
+       });
+       callback(content, "article");
+
+
+   },
+   error: function(request, error) {
+     console.log(error);
+   }
+ });
+ }
