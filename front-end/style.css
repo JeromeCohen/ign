@@ -27,7 +27,7 @@ a.title {
   color: #b51112;
   font-size: 12px;
   margin-bottom: 0.5em;
-  font-weight: bold; 
+  font-weight: bold;
 }
 
 
@@ -47,6 +47,7 @@ a.title {
 
 .list-group-item.list-group-item-action {
   border-radius: 5px;
+  border: none; 
 }
 
 .list-group-item.active {
