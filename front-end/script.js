@@ -8,7 +8,6 @@ $(function (){
     dataType: 'jsonp',
     crossdomain: true,
     success: data => {
-      console.log(data)
       content = data.data;
       var contentIds = '';
       data.data.forEach((item) => {
@@ -38,7 +37,7 @@ $(function (){
           type = "video";
           break;
         case "latest":
-          type = "article";
+          type = "latest";
           break;
       }
       //populate feed with articles
@@ -67,13 +66,17 @@ const loadFeed = (data, type) => {
 
 //pulls appropriate data from JSON and creates container
 const createHTMlHelper = (item, type) => {
-  if (item.contentType == type) {
+  if (item.contentType == type || type === "latest") {
+    if (type === "latest") {
+      type = item.contentType;
+    }
+    console.log(type);
     const feed = $('#feed');
     const ago = postedAgo(item.metadata.publishDate);
     const time = `${ago.day} days, ${ago.hour} hours, ${ago.minute} minutes`
     const imgurl = item.thumbnails[2].url;
-    const title = (type === 'video') ? item.metadata.title : item.metadata.headline;
-    const duration = (type === 'video') ? secondsToMinutes(item.metadata.duration) : '';
+    const title = (type === "video") ? item.metadata.title : item.metadata.headline;
+    const duration = (type === "video") ? secondsToMinutes(item.metadata.duration) : '';
 
     const count = item.metadata.comments;
     var comments = count;
@@ -86,11 +89,11 @@ const createHTMlHelper = (item, type) => {
          <div class="col-md-6">
           <div class="thumb-img">
             <img class="thumbnail" width="100%" src="${imgurl}" sizes="(max-width: 660px) 100vw, 660px">
-            <div class='duration'><i class="fas fa-play-circle fa-lg"></i> ${duration}</div>
+
           </div>
         </div>
         <div class="col-md-6 caption">
-          <p class='metadata'><span>${time} • <i class="far fa-comment fa-sm"></i> ${comments}</span></p>
+          <p class='metadata'><span>${time} - <i class="far fa-comment fa-sm"></i> ${comments}</span></p>
           <a class="title" href="#">${title}</a>
         </div>
       </div>`);
@@ -98,7 +101,11 @@ const createHTMlHelper = (item, type) => {
     feed.append(html);
 
     if (type === 'video') {
-      $('.duration').css('display', 'block');
+      const currentBlock = html.find(".thumb-img");
+      console.log(currentBlock);
+      currentBlock.append(`<div class='duration'><i class="fas fa-play-circle fa-lg"></i> ${duration}</div>`);
+      // console.log("show video");
+      // $('.duration').css('display', 'block');
     }
 
   }
@@ -142,13 +149,12 @@ const createHTMlHelper = (item, type) => {
      dataType: 'jsonp',
      crossdomain: true,
      success: data => {
-       console.log(data)
        count = 0;
        data.content.forEach((item) => {
          content[count].metadata.comments = item.count;
          count++;
        });
-       callback(content, "article");
+       callback(content, "latest");
 
 
    },

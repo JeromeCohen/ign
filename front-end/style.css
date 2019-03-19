@@ -27,6 +27,7 @@ a.title {
   color: #b51112;
   font-size: 12px;
   margin-bottom: 0.5em;
+  font-weight: bold; 
 }
 
 
@@ -81,7 +82,7 @@ img:hover {
 }
 
 .duration {
-  display: none;
+  display: block;
   position: absolute;
   bottom: 10px;
   left: 10px;
