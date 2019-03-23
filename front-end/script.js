@@ -1,5 +1,6 @@
 var content;
 
+
 $(function (){
   //pull content for IGN api
   $.ajax({
@@ -40,6 +41,7 @@ $(function (){
           type = "latest";
           break;
       }
+
       //populate feed with articles
       const feed = $('#feed');
       feed.fadeOut("slow", function() {
@@ -47,8 +49,9 @@ $(function (){
         loadFeed(content, type);
       });
       feed.fadeIn("slow", function() {
-        console.log('animation complete');
+
       });
+
 
       //add active styling to sidebar link
       var current = document.getElementsByClassName("active");
@@ -70,7 +73,7 @@ const createHTMlHelper = (item, type) => {
     if (type === "latest") {
       type = item.contentType;
     }
-    console.log(type);
+
     const feed = $('#feed');
     const ago = postedAgo(item.metadata.publishDate);
     const time = `${ago.day} days, ${ago.hour} hours, ${ago.minute} minutes`
@@ -84,12 +87,11 @@ const createHTMlHelper = (item, type) => {
       comments = "";
     }
 
-    html = $(`<div class="container">
+    html = $(`<div class="item">
        <div class="row">
-         <div class="col-md-6">
+         <div class="col-md-6 img-container">
           <div class="thumb-img">
-            <img class="thumbnail" width="100%" src="${imgurl}" sizes="(max-width: 660px) 100vw, 660px">
-
+            <img class="thumbnail img-fluid" width="100%" src="${imgurl}">
           </div>
         </div>
         <div class="col-md-6 caption">
@@ -102,10 +104,7 @@ const createHTMlHelper = (item, type) => {
 
     if (type === 'video') {
       const currentBlock = html.find(".thumb-img");
-      console.log(currentBlock);
       currentBlock.append(`<div class='duration'><i class="fas fa-play-circle fa-lg"></i> ${duration}</div>`);
-      // console.log("show video");
-      // $('.duration').css('display', 'block');
     }
 
   }
@@ -121,7 +120,11 @@ const createHTMlHelper = (item, type) => {
  }
 
  function secondsToMinutes(duration) {
-   return Math.floor(duration / 60) + ":" + (duration % 60);
+   seconds = duration % 60;
+   if (seconds < 10) {
+     seconds = '0' + seconds;
+   }
+   return Math.floor(duration / 60) + ":" + seconds;
  }
 
  function convertMS( milliseconds ) {

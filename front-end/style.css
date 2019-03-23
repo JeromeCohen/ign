@@ -5,12 +5,15 @@ body {
   background-color: #fefcfe
 }
 
-h1 {
+.top-title h1 {
+  font-weight: bold;
+}
+
+.top-title {
   border-bottom: 0px solid grey;
   border-width: thin;
   margin-top: 0.5em;
-  margin-bottom: 0.25em;
-  font-weight: bold;
+  margin-bottom: 10px;
 }
 
 a.title {
@@ -32,8 +35,7 @@ a.title {
 
 
 .caption {
-  margin-left: -0.5em;
-  padding: 0px 5px;
+  margin-left: -1em;
 }
 
 .sidebar {
@@ -47,7 +49,7 @@ a.title {
 
 .list-group-item.list-group-item-action {
   border-radius: 5px;
-  border: none; 
+  border: none;
 }
 
 .list-group-item.active {
@@ -60,9 +62,12 @@ a.title {
   border-radius: 5px;
 }
 
+.img-container {
+  /* padding-left: 0em; */
+}
+
 .thumb-img {
   position: relative;
-  margin-left: -15px;
 }
 
 
@@ -71,15 +76,11 @@ img:hover {
   filter: opacity(50%);
 }
 
-.container {
+.item {
   border-bottom: 0px solid grey;
   border-width: thin;
   padding-bottom: 1em;
   margin-bottom: 1em;
-}
-
-#feed {
-  padding: 0em;
 }
 
 .duration {
@@ -97,7 +98,16 @@ img:hover {
   margin-right: 0.2em;
 }
 
+.container-main {
+  margin: 0px 30px;
+}
 
-@media (min-width: 768px) {
+@media (max-width: 768px) {
+  .caption {
+    margin: 0 0em;
+  }
 
+  .container-main {
+    margin: 0px 15px;
+  }
 }
