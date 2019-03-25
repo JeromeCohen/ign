@@ -6,10 +6,7 @@ const port = 3000 || process.env.PORT;
 var knex = require('knex')({
   client: 'mysql',
   connection: {
-    host : 'us-cdbr-iron-east-03.cleardb.net',
-    user : 'ba46ee82f0feb2',
-    password : 'c02c1f42',
-    database : 'heroku_7e1867d4621a886'
+  //removed ;) 
   }
 });
 
@@ -28,18 +25,21 @@ app.get('/author/:name', (req, res) => {
 });
 
 app.get('/tag/:tag1/:tag2?/:tag3?', (req, res) => {
-  tag1 = req.params.tag1;
-  let tag2 = "x";
-  let tag3 = "x";
-  if (tag2 != null) {tag2 = req.params.tag2}
-  if (tag3 != null) {tag3 = req.params.tag3}
+  let where = 'WHERE ';
+  let params = [];
+  Object.keys(req.params).forEach(tag => {
+    if (req.params[tag] != null) {
+      where += 'tags.tag=? '
+      params.push(req.params[tag]);
+    }
+  });
 
   query = `SELECT *
            FROM articles
            INNER JOIN tag_relations tr ON tr.content_id=articles.content_id
            INNER JOIN tags ON tr.tag_id=tags.tag_id
-           WHERE tags.tag=? OR tags.tag=? OR tags.tag=?`
-  knex.raw(query, [tag1, tag2, tag3]).then((result) => {
+           ${where}`
+  knex.raw(query, params).then((result) => {
     res.send(result);
   });
 });
