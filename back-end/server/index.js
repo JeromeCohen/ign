@@ -1,12 +1,15 @@
 const express = require('express');
 const mysql = require('mysql');
 const app = express();
-const port = 3000 || process.env.PORT;
+const port = process.env.PORT || 3000;
 
 var knex = require('knex')({
   client: 'mysql',
   connection: {
-  //removed ;) 
+    host : 'us-cdbr-iron-east-03.cleardb.net',
+    user : 'ba46ee82f0feb2',
+    password : 'c02c1f42',
+    database : 'heroku_7e1867d4621a886'
   }
 });
 

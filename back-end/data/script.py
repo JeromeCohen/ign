@@ -44,10 +44,15 @@ authors_df = authors_df.append(authors_2_df)
 
 authors_df['author_id'] = [uuid.uuid4().hex for x in range(len(authors_df))]
 author_names_df = authors_df.rename(columns={'author':'name'}).drop(columns=['content_id', 'order'])
+author_names_df['name'] = author_names_df['name'].apply(lambda x: x.lower())
 authors_df.drop(columns=['author'], inplace=True)
 
+# - drop columns in articles and videos that are handled by new tables
+articles_df.drop(columns=['author_1', 'author_2', 'tag_1', 'tag_2', 'tag_3'], inplace=True)
+videos_df.drop(columns=['tag_1', 'tag_2', 'tag_3'], inplace=True)
+
 ############# - Pushing Pandas DFs to MySQL - #############
-engine = db.create_engine('mysql+pymysql://ba46ee82f0feb2:c02c1f42@us-cdbr-iron-east-03.cleardb.net/heroku_7e1867d4621a886')
+engine = db.create_engine('removed')
 articles_df.to_sql('articles', engine, if_exists='replace', index=False)
 videos_df.to_sql('videos', engine, if_exists='replace', index=False)
 tags_df.to_sql('tags', engine, if_exists='replace', index=False)
