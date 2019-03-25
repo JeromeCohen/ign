@@ -1,0 +1,19 @@
+Data Description:
+The data was first loaded into a Pandas dataframe in order to make cleaning and manipulation easier. Duplicates were first removed for
+good practice. Then, I examined which columns were not necessary. The second description column was dropped because it is a duplicate
+of the first. Every thumbnail related column was deleted aside from columns containing image URLs. The size, width, and height columns
+were all transitively related to each other and the image URL. I noticed that each thumbnail URL only differed at the last word. I considered
+keeping only one thumbnail_url column and adding the desired size into the URL programatically. However, I decided against this as I could
+not be sure that this URL structure will remain consistent. The 'published' column was also deleted as there was no variation in the data.
+
+Leading and trailing whitespace was deleted as a cleaning measure. Newline characters that were between text remain.
+
+Articles and videos were split into two tables since each had differing related information. For example, articles have authors while
+videos have duration. Keeping each content type together would have created many empty cells in the table. Aditionally, once the content
+was split into two tables, the column 'content_type' was deleted since it is redudant.
+
+Lastly, I created new tables to manage tags and authors. Not every article has two authors no every piece of content has three tags.
+Two tables were created to track authors. A table containing each author_id and the corresponding author's name. The name column does not
+contain atomical values since the column contains full names. The second author table maps content_id to author_id, as well as contains a
+column that represents if the author is a the primary or secondary author. To manage tags, I used the toxi schema. The schema is similar to how I handled authors since there is a table containing every possible
+tag and each tag_id and a table that stores every relationship between content and tags.
